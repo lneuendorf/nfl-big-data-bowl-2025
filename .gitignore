@@ -1,3 +1,35 @@
+# Data files
 data/
 *.csv
+*/tmp/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook hidden files
+*.ipynb_*
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Shell scripts
 scripts/commit.sh
+
+# Python package files
+*.egg-info/
+*.eggs
+dist/
+build/
