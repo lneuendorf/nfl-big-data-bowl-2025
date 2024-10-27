@@ -1,0 +1,19 @@
+name: bdb25
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - ipython
+  - jupyter
+  - ipykernel
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - pyarrow
+  - tqdm
+  - pip
+  - pip:
+    - nfl_data_py
