@@ -6,8 +6,8 @@ def standardize_direction(df):
     
     df_normalized.loc[df['play_direction'] == 'left', 'x'] = 120 - df_normalized['x']
     df_normalized.loc[df['play_direction'] == 'left', 'y'] = 53.3 - df_normalized['y']
-    df_normalized.loc[df['play_direction'] == 'left', 'dir'] = (360 - df_normalized['dir']) % 360
-    df_normalized.loc[df['play_direction'] == 'left', 'o'] = (180 - df_normalized['o']) % 360
+    df_normalized.loc[df['play_direction'] == 'left', 'dir'] = (90 - df_normalized['dir']) %360
+    df_normalized.loc[df['play_direction'] == 'left', 'o'] = (90 - df_normalized['o']) %360
     
     return df_normalized
 
