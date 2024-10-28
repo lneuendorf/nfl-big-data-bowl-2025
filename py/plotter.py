@@ -142,13 +142,13 @@ class TrackingDataPlotter:
             if plot_arrows:
                 # Plot direction arrows for offense
                 for _, player in df_frame_offense.iterrows():
-                    ax.arrow(player['x'], player['y'], -player['dx'], -player['dy'], 
+                    ax.arrow(player['x'], player['y'], player['dx'], player['dy'], 
                              head_width=0.5, head_length=0.5, fc=color['off'], ec=color['off'], 
                              alpha=alpha['player'], zorder=z_ord['player'])
     
                 # Plot direction arrows for defense
                 for _, player in df_frame_defense.iterrows():
-                    ax.arrow(player['x'], player['y'], -player['dx'], -player['dy'], 
+                    ax.arrow(player['x'], player['y'], player['dx'], player['dy'], 
                              head_width=0.5, head_length=0.5, fc=color['def'], ec=color['def'], 
                              alpha=alpha['player'], zorder=z_ord['player'])
 
