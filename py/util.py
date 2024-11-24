@@ -5,9 +5,9 @@ import pandas as pd
 import numpy as np
 
 def standardize_direction(
-    df_tracking: pd.DataFrame,
-    df_play: pd.DataFrame
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        df_tracking: pd.DataFrame,
+        df_play: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Standardize the direction of the play and the players to be vertical.
 
     The direction of the play is set to be bottom to top, with the offensive
@@ -25,6 +25,8 @@ def standardize_direction(
     
     original_x = df_tracking['x'].copy()
     original_y = df_tracking['y'].copy()
+    original_dir = df_tracking['dir'].copy()
+    original_o = df_tracking['o'].copy()
     
     df_tracking['y'] = np.where(
         left_play, 
@@ -36,21 +38,16 @@ def standardize_direction(
         original_y,
         53.3 - original_y
     )
-
-    #TODO: figure out if you need to flip the direction of the players 
-    # df_tracking['dir'] = np.where(
-    #     left_play, 
-    #     (df_tracking['dir'] - 90) % 360, 
-    #     (df_tracking['dir'] + 90) % 360
-    # )
-    # df_tracking['o'] = np.where(
-    #     left_play, 
-    #     (df_tracking['o'] - 90) % 360, 
-    #     (df_tracking['o'] + 90) % 360
-    # )
-
-    df_tracking['dir'] = (180 - df_tracking['dir']) % 360
-    df_tracking['o'] = (180 - df_tracking['o']) % 360
+    df_tracking['dir'] = np.where(
+        left_play,
+        (((180 - original_dir) % 360) + 180) % 360,
+        (180 - original_dir) % 360,
+    )
+    df_tracking['o'] = np.where(
+        left_play,
+        (((180 - original_o) % 360) + 180) % 360,
+        (180 - original_o) % 360,
+    )
 
     key = ['game_id', 'play_id']
     df_play = df_play.merge(
