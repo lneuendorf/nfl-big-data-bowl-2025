@@ -172,8 +172,8 @@ key = ['game_id','play_id']
 
 # Filter down to run plays only
 run_plays = ['INSIDE_LEFT', 'OUTSIDE_RIGHT', 'OUTSIDE_LEFT', 'INSIDE_RIGHT']
-df_run_plays = df_play.query('~rush_location_type.isin(@run_plays)')[key + ['rush_location_type']]
-df_tracking = df_tracking.merge(df_run_plays, on=key, how='inner').dropna(subset=['rush_location_type'], ignore_index=True)
+df_run_plays = df_play.query('rush_location_type.isin(@run_plays)')[key + ['rush_location_type']]
+df_tracking = df_tracking.merge(df_run_plays, on=key, how='inner').dropna(subset=['rush_location_type'])
 
 # make folders in each directory for the different types of plays
 for path in [MOTION_PATH, SHIFT_PATH, MOTION_AND_SHIFT_PATH, REGULAR_PATH]:
@@ -202,50 +202,42 @@ no_motion_no_shift_plays = plays_grouped[
 ]
 no_motion_no_shift_plays = no_motion_no_shift_plays[key].reset_index(drop=True)
 
-for i in range(30):
+for i in tqdm(range(30), desc="Animating motion only plays"):
     try:
         row = np.random.choice(motion_only_plays.index)
         game_id, play_id = motion_only_plays.loc[row, key]
         run_type = df_tracking[(df_tracking['game_id'] == game_id) & (df_tracking['play_id'] == play_id)]['rush_location_type'].values[0]
         FOLDER = join(MOTION_PATH, run_type)
-        logging.info(f'Starting animation for play {play_id} from game {game_id} (motion only)')
         npa.animate_play(game_id, play_id, output='file', filepath=join(FOLDER, f'{game_id}_{play_id}.mp4'))
-        logging.info(f'Successfully saved animation for play {play_id} from game {game_id}')
     except Exception as e:
-        logging.error(f'Failed to animate play {play_id} from game {game_id}: {e}')
+        logging.error(f'Failed to animate play a motion play: {e}')
 
-for i in range(30):
+for i in tqdm(range(30), desc="Animating shift only plays"):
     try:
         row = np.random.choice(shift_only_plays.index)
         game_id, play_id = shift_only_plays.loc[row, key]
         run_type = df_tracking[(df_tracking['game_id'] == game_id) & (df_tracking['play_id'] == play_id)]['rush_location_type'].values[0]
         FOLDER = join(SHIFT_PATH, run_type)
-        logging.info(f'Starting animation for play {play_id} from game {game_id} (shift only)')
         npa.animate_play(game_id, play_id, output='file', filepath=join(FOLDER, f'{game_id}_{play_id}.mp4'))
-        logging.info(f'Successfully saved animation for play {play_id} from game {game_id}')
     except Exception as e:
-        logging.error(f'Failed to animate play {play_id} from game {game_id}: {e}')
+        logging.error(f'Failed to animate play a shift play: {e}')
 
-for i in range(30):
+for i in tqdm(range(30), desc="Animating motion and shift plays"):
     try:
         row = np.random.choice(motion_and_shift_plays.index)
         game_id, play_id = motion_and_shift_plays.loc[row, key]
         run_type = df_tracking[(df_tracking['game_id'] == game_id) & (df_tracking['play_id'] == play_id)]['rush_location_type'].values[0]
         FOLDER = join(MOTION_AND_SHIFT_PATH, run_type)
-        logging.info(f'Starting animation for play {play_id} from game {game_id} (motion and shift)')
         npa.animate_play(game_id, play_id, output='file', filepath=join(FOLDER, f'{game_id}_{play_id}.mp4'))
-        logging.info(f'Successfully saved animation for play {play_id} from game {game_id}')
     except Exception as e:
-        logging.error(f'Failed to animate play {play_id} from game {game_id}: {e}')
+        logging.error(f'Failed to animate play a motion and shift play: {e}')
     
-for i in range(30):
+for i in tqdm(range(30), desc="Animating regular plays"):
     try:
         row = np.random.choice(no_motion_no_shift_plays.index)
         game_id, play_id = no_motion_no_shift_plays.loc[row, key]
         run_type = df_tracking[(df_tracking['game_id'] == game_id) & (df_tracking['play_id'] == play_id)]['rush_location_type'].values[0]
         FOLDER = join(REGULAR_PATH, run_type)
-        logging.info(f'Starting animation for play {play_id} from game {game_id} (no motion or shift)')
         npa.animate_play(game_id, play_id, output='file', filepath=join(FOLDER, f'{game_id}_{play_id}.mp4'))
-        logging.info(f'Successfully saved animation for play {play_id} from game {game_id}')
     except Exception as e:
-        logging.error(f'Failed to animate play {play_id} from game {game_id}: {e}')
+        logging.error(f'Failed to animate play a regular play: {e}')

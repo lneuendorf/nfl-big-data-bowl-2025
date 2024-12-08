@@ -6,6 +6,7 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.offsetbox import OffsetImage
 from matplotlib.patches import Wedge
 from matplotlib.colors import to_rgba
+import matplotlib.colors as mcolors
 from IPython.display import HTML
 import urllib
 import PIL
@@ -87,19 +88,40 @@ class NFLPlayAnimator:
             'DB': to_rgba('darkorange'),
             'LB': to_rgba('darkgreen'),
         }
+        self.position_mapping = {
+            'MLB': 'LB',
+            'OLB': 'LB',
+            'ILB': 'LB',
+            'FS': 'S',
+            'SS': 'S',
+            'NT': 'DL',
+            'DE': 'DL',
+            'DT': 'DL',
+            'CB': 'DB',
+            'RB': 'RB',
+            'FB': 'RB',
+            'WR': 'WR',
+            'TE': 'TE',
+            'QB': 'QB',
+            'C': 'OL',
+            'G': 'OL',
+            'T': 'OL',
+        }
 
         self.zorder = {
             'field': 1,
             'field_markers': 2,
             'endzones': 3,
             'los_and_fd': 4,
-            'players': 5,
-            'player_numbers': 6,
-            'football': 7,
-            'scoreboard_background': 8,
-            'scoreboard_foreground': 9,
-            'player_legend': 10,
-            'player_legend_text': 11,
+            'defense': 5,
+            'defense_numbers': 6,
+            'offense': 7,
+            'offense_numbers': 8,
+            'football': 9,
+            'scoreboard_background': 10,
+            'scoreboard_foreground': 11,
+            'player_legend': 12,
+            'player_legend_text': 13,
         }
 
         if player_display_type not in ['dots-team', 'dots-positional', 'positions', 'jerseys']:
@@ -425,7 +447,7 @@ class NFLPlayAnimator:
         
         # Plot players and football
         if self.player_display_type in ['dots-positional', 'dots-team']:
-            radius = 0.3
+            radius = 0.4
         else:
             radius = 0.7
         for club, group in frame_data.groupby('club'):
@@ -441,16 +463,21 @@ class NFLPlayAnimator:
             else:
                 # Assign teams different colors
                 if club == self.play_data['possession_team']:
+                    color_hex = self.poss_tm_color
                     color = to_rgba(self.poss_tm_color)
                     path_color = 'grey'
                     ec = to_rgba(self.poss_tm_edge_color)
+                    zord_players = self.zorder['offense']
+                    zord_player_numbers = self.zorder['offense_numbers']
                 else:
+                    color_hex = self.def_tm_color
                     color = to_rgba(self.def_tm_color)
                     path_color = 'black'
                     ec = to_rgba(self.def_tm_edge_color)
+                    zord_players = self.zorder['defense']
+                    zord_player_numbers = self.zorder['defense_numbers']
 
-
-                if self.show_trenches_paths:
+                if frame_id >= self.snap_frame_id and self.show_trenches_paths:
                     positions = ['T','TE','G','C','ILB','MLB','LB','G','DE','DT','NT','OLB']
                     plays_before_current_frame = self.tracking_data.query('frame_id < @frame_id and position in @positions')
                     if plays_before_current_frame.query('club == @club').shape[0] != 0:
@@ -459,7 +486,7 @@ class NFLPlayAnimator:
                             plays_before_current_frame.query('club == @club')['y'],
                             color=path_color,
                             s=5,
-                            zorder=self.zorder['players']
+                            zorder=zord_players
                         )
 
                 # Plot players as circles with a flat side and a front "half-square"
@@ -475,7 +502,7 @@ class NFLPlayAnimator:
                     x, y = player['x'], player['y']
                                             
                     # Create the Wedge for each player (flat side 180 degrees opposite orientation)
-                    wedge = Wedge((x, y), radius, theta1=orientation+90, theta2=orientation-90, color=color, zorder=self.zorder['players'], ec=ec)
+                    wedge = Wedge((x, y), radius, theta1=orientation+90, theta2=orientation-90, color=color, zorder=zord_players, ec=ec)
 
                     # Add the wedge to the axis
                     self.ax.add_patch(wedge)
@@ -504,7 +531,7 @@ class NFLPlayAnimator:
                     ]
 
                     # Create the half-square polygon and add it to the axis
-                    half_square = Polygon(corners, closed=True, color=color, zorder=self.zorder['players'], ec=ec)
+                    half_square = Polygon(corners, closed=True, color=color, zorder=zord_players, ec=ec)
                     self.ax.add_patch(half_square)
 
                     # add rectangular patch where circle and square meet
@@ -519,7 +546,7 @@ class NFLPlayAnimator:
                         (left_edge_x -.1 * dx, left_edge_y - .1 * dy),
                         (right_edge_x - .1 * dx, right_edge_y -.1 * dy)
                     ]
-                    rect = Polygon(corners, closed=True, color=color, zorder=self.zorder['players'])
+                    rect = Polygon(corners, closed=True, color=color, zorder=zord_players)
                     self.ax.add_patch(rect)
 
                     if self.plot_dir_arrows:
@@ -528,18 +555,41 @@ class NFLPlayAnimator:
                         dy = 0.5 * np.sin(dir_radians)
                         arrow = Polygon(
                             [[x + dx, y + dy], [x + 0.5 * dx - 0.25 * dy, y + 0.5 * dy + 0.25 * dx], [x + 0.5 * dx + 0.25 * dy, y + 0.5 * dy - 0.25 * dx]],
-                            closed=True, color='black', zorder=self.zorder['players']
+                            closed=True, color='black', zorder=zord_players
                         )
                         self.ax.add_patch(arrow)
 
                     # Plot the player's jersey number, centered at (x, y)
                     if self.player_display_type == 'jerseys':
                         jersey_number = int(player['jersey_number'])  # Convert float to int
-                        self.ax.text(x, y, str(jersey_number), color='white', ha='center', va='center', fontweight='bold', fontsize=12, zorder=self.zorder['player_numbers'])
-                    elif self.player_display_type == 'positions':
-                        position = player['position']  # Get the player's position
-                        self.ax.text(x, y, position, color='white', ha='center', va='center', fontweight='bold', fontsize=9, zorder=self.zorder['player_numbers'])
-        
+                        self.ax.text(
+                            x, y, 
+                            str(jersey_number), 
+                            color='white', 
+                            ha='center', va='center', 
+                            fontweight='bold', 
+                            fontsize=12, 
+                            zorder=zord_player_numbers
+                        )
+                    elif self.player_display_type in ['positions', 'dots-team']:
+                        if self.player_display_type == 'positions':
+                            fontsize = 9
+                        else:
+                            fontsize = 7
+                        # calculate font color which maximizes contrast with player color
+                        font_color = '#000000' if contrast_ratio(color_hex, '#000000') > contrast_ratio(color_hex, '#ffffff') else '#ffffff'
+                        position = self.position_mapping.get(player['position'], player['position'])
+                        self.ax.text(
+                            x, y, 
+                            position, 
+                            color=font_color,
+                            ha='center', 
+                            va='center', 
+                            fontweight='bold',
+                            fontsize=fontsize,
+                            zorder=zord_player_numbers
+                        )
+            
             # Dynamically adjust the y-axis limit based on the ball's y position
             if ball_y is not None:
                 if ball_y < self.y_limit_min + 10:  # Ball near the bottom
@@ -631,7 +681,8 @@ class NFLPlayAnimator:
         game_id, 
         play_id, 
         output='console', 
-        filepath=None
+        filepath=None,
+        fps=10
     ) -> None:
         """Create the animation of the play.
         
@@ -640,6 +691,7 @@ class NFLPlayAnimator:
             play_id: The play id.
             output: The output of the animation. Options are 'console' or 'file'. Defaults to 'console'.
             filepath: The filepath to save the animation if output is 'file'. Defaults to None.
+            fps: The frames per second of the animation. Defaults to 10.
         """
 
         if output == 'file' and filepath is None: 
@@ -672,7 +724,7 @@ class NFLPlayAnimator:
         plt.close(self.fig)
 
         if output == 'console':
-            return HTML(ani.to_jshtml(fps=10))
+            return HTML(ani.to_jshtml(fps=fps))
         elif output == 'file':
-            ani.save(filepath, writer='ffmpeg', fps=10)
+            ani.save(filepath, writer='ffmpeg', fps=fps)
             return None

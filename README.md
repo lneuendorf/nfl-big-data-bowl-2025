@@ -14,3 +14,20 @@
 2022102302, 2606
 2022100903, 2974 - good shift play where defense stays is gap sound -> inside run no gain
 2022101610, 2602 - mistagged - event has shift, when it was motion 
+2022100903, 369 - mislabled as is an inside left run but runs right
+
+# Weird Plays
+2022091101_1826 - balls stays on the qb when its an RB run for a gain of 1
+
+
+# Removed Plays:
+- plays with a penalty
+
+
+line set
+    Case 1: line is already set at start of recording
+    Case 2: line is set midway through recording (after huddle_break_offense) prior to snap
+        a. set and then immediate shifts or motion (e.g. 2022091102_2738)
+        b. set and then motion or shifts after a bit of time
+        c. set and no motion or shifts
+        d. set and immediate ball snap
