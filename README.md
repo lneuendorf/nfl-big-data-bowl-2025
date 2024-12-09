@@ -42,20 +42,13 @@
 - may have to split up getting first line set and then subsiquent to make first more leniant (10 player min)
 
 # Problem Plays
+2022091113_1363 - counts qb as motion when qb moves up to talk to center and then moves back to shotgun
 2022091102_2738 - receiver never gets set before shifting
 2022091102_2436 - receiver doesnt get set enough and goes in motion, line_set at end of motion
 2022091200_3596 - fly motion, receiver never sets before starting motion
 2022091108_1354 - fly shift and motion with no initial line set
 
 # Gameplan
-1. Implement new line_set algorithm to take avg off player speed on a frame. then set threshold and find areas below threshold, join blips above that of under 5 frames. then minimim speed in that area is line_set event.
 2. Classify motions
     i. look at value counts
 4. Study up on how defenses counter motion
-
-
-
-
-Added logic to line set 
-- if whole play is under thrshold -> favoe line_set point closer to snap (e.g. on 2022091103_4993)
-- if smoothed avg speed beifly jumps above threshold, dont count it as a new lineset (over 20 frames? -> check on 2022091104_3122 verse 2022091100_3334)
