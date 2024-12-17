@@ -23,6 +23,10 @@
 # Removed Plays:
 - plays with a penalty
 - qb kneel & qb spike
+- qb scramble
+- wildcat plays
+- plays without exactly 5 lineman
+- plays no in balanced offensive line formation at last lineset
 
 # Classifying Events
     1. Line Set
@@ -48,7 +52,5 @@
 2022091200_3596 - fly motion, receiver never sets before starting motion
 2022091108_1354 - fly shift and motion with no initial line set
 
-# Gameplan
-2. Classify motions
-    i. look at value counts
-4. Study up on how defenses counter motion
+Motion:
+- handle for weird motion/shift hybrid (really a motion), where a player motions and comes to breif stop before play starts (2022091100_996 is an example of multiple shifts)

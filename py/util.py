@@ -49,25 +49,22 @@ def standardize_direction(
         (180 - original_o) % 360,
     )
 
-    key = ['game_id', 'play_id']
     df_play = df_play.merge(
-        right = df_tracking.drop_duplicates(key)[key + ['play_direction']], 
-        how = 'left', 
-        on = key
+        df_tracking[['game_id','play_id','play_direction']].drop_duplicates(['game_id','play_id']),
+        on=['game_id','play_id'],
+        how='left'
     )
-
-    # Drop plays that arent in the tracking data
-    df_play = df_play.dropna(subset=['play_direction']).reset_index(drop=True)
-
+    df_play = df_play.dropna(subset=['play_direction'])
     df_play['absolute_yardline_number'] = np.where(
         df_play.play_direction == "left", 
         120 - df_play.absolute_yardline_number, 
         df_play.absolute_yardline_number
     )
     
-    df_play.drop('play_direction', axis=1)
+    df_play = df_play.drop('play_direction', axis=1)
 
     return df_tracking, df_play
 
-def uncamelcase_columns(df: pd.DataFrame) -> None:
+def uncamelcase_columns(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = [re.sub(r'(?<!^)(?=[A-Z])', '_', word).lower() for word in df.columns]
+    return df

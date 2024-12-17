@@ -33,3 +33,5 @@ scripts/commit.sh
 *.eggs
 dist/
 build/
+
+paths.json
