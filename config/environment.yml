@@ -8,13 +8,14 @@ dependencies:
   - jupyter
   - ipykernel
   - pandas
-  - numpy
+  - numpy==1.26.4
   - matplotlib
   - seaborn
   - scikit-learn
   - pyarrow
   - tqdm
   - ffmpeg
+  - xgboost
   - pip
   - pip:
     - nfl_data_py

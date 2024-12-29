@@ -13,7 +13,9 @@ def plot_play_with_speed(
     plot_motion=True,
     highlight_offensive_positions=True,
     show_motion_frames=False,
-    highlight_oline=False
+    highlight_oline=False,
+    highlight_primary_rb=False,
+    highlight_pullers=False
 ) -> HTML:
     qry = 'game_play_id==@game_play_id'
     tracking_play = df_tracking.query(qry).copy().reset_index(drop=True)
@@ -112,11 +114,19 @@ def plot_play_with_speed(
 
         if highlight_oline:
             oline = current_frame.query('offense and on_oline')
-            ax.scatter(oline.x, oline.y, c='red', marker='x', label='Offensive Line', zorder=2)
+            ax.scatter(oline.x, oline.y, c='red', marker='x', label='Offensive Line', zorder=2, s=20, lw=1)
+
+        if highlight_primary_rb:
+            primary_rb = current_frame.query('offense and primary_rb')
+            ax.scatter(primary_rb.x, primary_rb.y, c='green', marker='x', label='Primary RB', zorder=2, s=20, lw=1)
+
+        if highlight_pullers:
+            pullers = current_frame.query('offense and (puller_left_of_rt or puller_left_of_center)')
+            ax.scatter(pullers.x, pullers.y, facecolors="none", edgecolor='pink', label='Puller', zorder=2)
 
         if plot_motion:
             motion_player = current_frame.query('motion_player')
-            ax.scatter(motion_player.x, motion_player.y, c='red', edgecolor='black', label='Motion Player', zorder=2, lw=1, s=20)
+            ax.scatter(motion_player.x, motion_player.y, c='red', edgecolor='black', label='Motion Player', zorder=2)
 
         # Plot defense and football
         defense = current_frame.query('~offense and club != "football"')
