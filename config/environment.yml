@@ -17,6 +17,7 @@ dependencies:
   - ffmpeg
   - xgboost
   - pymc
+  - statsmodels
   - pip
   - pip:
     - nfl_data_py
