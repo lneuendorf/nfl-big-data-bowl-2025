@@ -16,6 +16,7 @@ dependencies:
   - tqdm
   - ffmpeg
   - xgboost
+  - pymc
   - pip
   - pip:
     - nfl_data_py
