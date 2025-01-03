@@ -18,6 +18,7 @@ dependencies:
   - xgboost
   - pymc
   - statsmodels
+  - graphviz
   - pip
   - pip:
     - nfl_data_py
